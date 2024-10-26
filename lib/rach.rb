@@ -4,9 +4,11 @@ require 'dotenv'
 Dotenv.load
 
 require_relative "client"
-require_relative "response"
-require_relative "structured_prompt"
 require_relative "errors"
+require_relative "response"
+require_relative "message"
+require_relative "message_template"
+
 
 OpenAI.configure do |config|
   config.access_token = ENV.fetch("OPENAI_ACCESS_TOKEN")
