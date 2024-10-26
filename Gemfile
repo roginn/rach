@@ -3,6 +3,7 @@ source "https://rubygems.org"
 # Core dependencies
 gem "ruby-openai", "~> 5.1"  # For OpenAI API interactions
 gem "dotenv", "~> 2.8"       # For environment variable management
+gem "json-schema_builder"
 
 group :development do
   # gem "rake", "~> 13.0"          # Task automation
