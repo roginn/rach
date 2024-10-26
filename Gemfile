@@ -18,3 +18,5 @@ end
 #   gem "webmock", "~> 3.19"       # HTTP request stubbing
 #   gem "simplecov", "~> 0.22"     # Code coverage analysis
 # end
+
+gemspec

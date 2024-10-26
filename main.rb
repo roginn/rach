@@ -1,4 +1,4 @@
-require_relative "rach"
+require_relative "lib/rach"
 
 # Optional: Add convenience method at the root level
 def self.chat(message, **options)

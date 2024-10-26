@@ -1,5 +1,3 @@
-require "openai"
-
 module Rach
   class Client
     def initialize(model: "gpt-3.5-turbo")
