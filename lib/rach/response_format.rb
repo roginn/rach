@@ -26,8 +26,31 @@ module Rach
       def prepare_schema_for_api(schema)
         schema.additional_properties(false)
         schema_hash = schema.as_json.deep_symbolize_keys
-        schema_hash[:required] = schema_hash[:properties].keys if schema_hash[:properties]
+        
+        # Recursively set additional_properties: false and required for all objects
+        deep_set_object_properties(schema_hash)
+        
         schema_hash
+      end
+
+      def deep_set_object_properties(schema_hash)
+        return unless schema_hash.is_a?(Hash)
+
+        if schema_hash[:type] == "object"
+          schema_hash[:additionalProperties] = false
+          # Set required to include all properties if properties exist
+          if schema_hash[:properties]
+            schema_hash[:required] = schema_hash[:properties].keys
+          end
+        end
+
+        schema_hash.each_value do |value|
+          if value.is_a?(Hash)
+            deep_set_object_properties(value)
+          elsif value.is_a?(Array)
+            value.each { |item| deep_set_object_properties(item) }
+          end
+        end
       end
     end
   end
