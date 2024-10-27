@@ -2,8 +2,8 @@ require_relative "lib/rach"
 require 'pry'
 
 client = Rach::Client.new
-# response = client.chat("Hello, how are you?")
-# puts response.content
+response = client.chat("Hello, how are you?")
+puts response.content
 
 # class MathStepByStepSchema
 #   include Rach::ResponseFormat
@@ -59,24 +59,28 @@ class GermanTranslatorSchema
   end
 end
 
-convo = Rach::Conversation.new
-convo.system "You teach the German language."
-convo.user "Translate: There are two birds looking at each other outside my window."
+# convo = Rach::Conversation.new
+# convo.system "You teach the German language."
+# convo.user "Translate: There are two birds looking at each other outside my window."
 
-response = client.chat convo
-puts response.content
-
-convo.add_response response
-
-# convo.user "Explain the structure of the translation."
-
-# response = client.chat(convo, response_format: GermanTranslatorSchema.render(:explain_structure))
+# response = client.chat convo
 # puts response.content
 
 # convo.add_response response
 
-binding.pry
-convo.user "Tag the parts of speech in the translation."
+# convo.user "Explain the structure of the translation."
+# response = client.chat(convo, response_format: GermanTranslatorSchema.render(:explain_structure))
+# puts response.content
+# convo.add_response response
 
-response = client.chat(convo, response_format: GermanTranslatorSchema.render(:pos_tagger))
-puts response.content
+
+# convo.user "Tag the parts of speech in the translation."
+# response = client.chat(convo, response_format: GermanTranslatorSchema.render(:pos_tagger))
+# puts response.content
+
+
+
+require_relative "get_weather"
+
+binding.pry
+response = client.chat("What is the weather in San Francisco?", functions: [GetWeather.function_schema])

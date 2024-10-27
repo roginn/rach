@@ -1,12 +1,35 @@
 module Rach
   class Client
+    attr_reader :tracker, :client, :model
+
     def initialize(model: "gpt-4o-mini")
-      @client = OpenAI::Client.new
+      @client = OpenAI::Client.new(log_errors: true)
       @model = model
+      @tracker = UsageTracker.new
     end
 
-    def chat(prompt, response_format: nil)
-      messages = case prompt
+    def chat(prompt, response_format: nil, tools: nil)
+      messages = format_messages(prompt)
+      
+      response = Response.new(
+        @client.chat(
+          parameters: {
+            model: @model,
+            messages:,
+            response_format:,
+            tools:,
+          }.compact
+        )
+      )
+      
+      @tracker.track(response)
+      response
+    end
+
+    private
+
+    def format_messages(prompt)
+      case prompt
       when String
         [{ role: "user", content: prompt }]
       when Message
@@ -16,16 +39,6 @@ module Rach
       else
         raise ArgumentError, "prompt must be a String, Message, or Conversation"
       end
-
-      response = @client.chat(
-        parameters: {
-          model: @model,
-          messages:,
-          response_format:,
-        }.compact
-      )
-      
-      Response.new(response)
     end
   end
 end
