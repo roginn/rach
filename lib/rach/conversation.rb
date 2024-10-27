@@ -10,8 +10,12 @@ module Rach
       self
     end
 
+    def add_response(response)
+      assistant(response.content)
+    end
+
     def add(content, role: "user")
-      add_message(Message.new(content, role:))
+      add_message(Message.new(content: content, role: role))
     end
 
     def system(content)
