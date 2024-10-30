@@ -39,11 +39,14 @@ module Rach
 
     def clear
       @messages.clear
-      self
     end
 
     def empty?
       @messages.empty?
+    end
+
+    def pop
+      @messages.pop
     end
   end
 end
