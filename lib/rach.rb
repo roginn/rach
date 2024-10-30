@@ -1,7 +1,4 @@
 require 'openai'
-require 'dotenv'
-
-Dotenv.load
 
 require_relative "rach/version"
 require_relative "rach/client"

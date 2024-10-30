@@ -1,5 +1,8 @@
 require_relative "lib/rach"
 require 'pry'
+require 'dotenv'
+
+Dotenv.load
 
 client = Rach::Client.new
 response = client.chat("Hello, how are you?")
