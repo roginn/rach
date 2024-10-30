@@ -4,7 +4,14 @@ require 'dotenv'
 
 Dotenv.load
 
-client = Rach::Client.new
+access_token = ENV.fetch("OPENAI_ACCESS_TOKEN")
+
+OpenAI.configure do |config|
+  config.log_errors = true
+end
+
+
+client = Rach::Client.new(access_token: access_token)
 response = client.chat("Hello, how are you?")
 puts response.content
 
