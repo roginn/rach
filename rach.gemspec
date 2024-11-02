@@ -12,6 +12,8 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/roginn/rach"
   spec.license       = "MIT"
   
+  spec.required_ruby_version = ">= 3.0"
+  
   spec.files         = Dir["{lib}/**/*", "LICENSE", "README.md"]
   spec.require_paths = ["lib"]
   
