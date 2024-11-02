@@ -80,5 +80,11 @@ module Rach
     def function_description
       raise NotImplementedError, "#{self.class} must implement #function_description"
     end
+
+    def validate_arguments!(arguments)
+      unless schema.validate(arguments)
+        raise ArgumentError, "Invalid arguments for function #{function_name}"
+      end
+    end
   end
 end

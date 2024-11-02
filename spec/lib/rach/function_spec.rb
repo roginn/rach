@@ -15,8 +15,8 @@ RSpec.describe Rach::Function do
 
     def schema
       object do
-        string :location, "The city and state"
-        string :unit, "The temperature unit", enum: ["celsius", "fahrenheit"]
+        string :location, description: "The city and state"
+        string :unit, description: "The temperature unit", enum: ["celsius", "fahrenheit"]
       end
     end
 
@@ -63,11 +63,13 @@ RSpec.describe Rach::Function do
         "type" => "object",
         "properties" => {
           "location" => { 
-            "type" => "string"
+            "type" => "string",
+            "description" => "The city and state"
           },
           "unit" => {
             "type" => "string",
-            "enum" => ["celsius", "fahrenheit"]
+            "enum" => ["celsius", "fahrenheit"],
+            "description" => "The temperature unit"
           }
         }
       }
@@ -77,6 +79,60 @@ RSpec.describe Rach::Function do
 
     it 'validates correct parameters' do
       expect { function.execute(**valid_params) }.not_to raise_error
+    end
+
+    # it 'raises ArgumentError for missing required parameters' do
+    #   expect { 
+    #     function.validate_arguments!(location: "San Francisco, CA") 
+    #   }.to raise_error(ArgumentError, "Invalid arguments for function get_current_weather")
+    # end
+
+    it 'raises ArgumentError for invalid enum values' do
+      expect { 
+        function.validate_arguments!(location: "San Francisco, CA", unit: "kelvin") 
+      }.to raise_error(ArgumentError, "Invalid arguments for function get_current_weather")
+    end
+
+    # it 'raises ArgumentError for additional properties' do
+    #   expect { 
+    #     function.validate_arguments!(location: "San Francisco, CA", unit: "celsius", extra: "value") 
+    #   }.to raise_error(ArgumentError, "Invalid arguments for function get_current_weather")
+    # end
+
+    it 'validates correct parameters without raising error' do
+      expect { 
+        function.validate_arguments!(valid_params) 
+      }.not_to raise_error
+    end
+  end
+
+  describe '.function_schema' do
+    let(:schema) { TestWeatherFunction.function_schema }
+
+    it 'generates valid function schema' do
+      expect(schema).to include(
+        type: "function",
+        function: {
+          name: "get_current_weather",
+          description: "Get the current weather for a location",
+          parameters: {
+            type: "object",
+            additionalProperties: false,
+            required: [:location, :unit],
+            properties: {
+              location: {
+                type: "string",
+                description: "The city and state"
+              },
+              unit: {
+                type: "string",
+                enum: ["celsius", "fahrenheit"],
+                description: "The temperature unit"
+              }
+            }
+          }
+        }
+      )
     end
   end
 end

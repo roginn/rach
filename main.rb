@@ -92,5 +92,44 @@ end
 
 require_relative "get_weather"
 
+class MakeOrder
+  include Rach::Function
+
+  def function_name
+    "make_order"
+  end
+
+  def function_description
+    "Make an order for a product"
+  end
+
+  def schema
+    object do
+      string :product_name
+      integer :quantity
+    end
+  end
+
+  def execute(product_name:, quantity:)
+    "Ordering #{quantity} of #{product_name}"
+  end
+end
+
+
+tools = [GetWeather, MakeOrder]
+
+# response = client.chat("What is the weather in San Francisco?", tools:)
+response = client.chat("I'd like to buy 2 apples.", tools:)
+
+
+response.on_function(GetWeather) do |fn, args|
+  puts "Weather: #{fn.execute(**args)}"
+end.on_function(MakeOrder) do |fn, args|
+  puts "Order: #{fn.execute(**args)}"
+end.on_content do |content|
+  puts "Content: #{content}"
+end
+
 binding.pry
-response = client.chat("What is the weather in San Francisco?", functions: [GetWeather.function_schema])
+puts response.content
+

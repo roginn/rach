@@ -10,6 +10,7 @@ module Rach
 
     def chat(prompt, response_format: nil, tools: nil)
       messages = format_messages(prompt)
+      formatted_tools = tools&.map(&:function_schema)
       
       response = Response.new(
         @client.chat(
@@ -17,7 +18,7 @@ module Rach
             model: @model,
             messages:,
             response_format:,
-            tools:,
+            tools: formatted_tools,
           }.compact
         )
       )

@@ -46,6 +46,23 @@ module Rach
       usage&.fetch("total_tokens", 0)
     end
 
+    def on_function(function_class = nil, &block)
+      return self unless function_call?
+
+      function = function_class.new
+      return self unless function.function_name == function_name
+
+      args = function_arguments.transform_keys(&:to_sym)
+      function.validate_arguments!(args)
+      block.call(function, args)
+      self
+    end
+
+    def on_content(&block)
+      block.call(content) if content
+      self
+    end
+
     private
 
     def message
