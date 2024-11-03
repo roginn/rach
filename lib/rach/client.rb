@@ -19,6 +19,7 @@ module Rach
             messages:,
             response_format:,
             tools: formatted_tools,
+            tool_choice: tools ? "required" : "auto",
           }.compact
         )
       )
