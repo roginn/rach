@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Rach::Client do
   let(:tracker) { instance_double(Rach::UsageTracker) }
-  
+
   before do
     allow(Rach::UsageTracker).to receive(:new).and_return(tracker)
     allow(tracker).to receive(:track)
@@ -13,7 +13,7 @@ RSpec.describe Rach::Client do
       let(:tool) do
         Class.new do
           include Rach::Function
-          
+
           def function_name
             "test_tool"
           end
@@ -36,7 +36,7 @@ RSpec.describe Rach::Client do
 
       it "sets tool_choice to 'required' when tools are present" do
         client = described_class.new(access_token: "fake-token")
-        
+
         expect_any_instance_of(OpenAI::Client).to receive(:chat).with(
           parameters: hash_including(tool_choice: "required")
         )
@@ -44,15 +44,15 @@ RSpec.describe Rach::Client do
         client.chat("test prompt", tools: [tool])
       end
 
-      it "sets tool_choice to 'auto' when tools are not present" do
+      it "sets tool_choice to nil when tools are not present" do
         client = described_class.new(access_token: "fake-token")
-        
+
         expect_any_instance_of(OpenAI::Client).to receive(:chat).with(
-          parameters: hash_including(tool_choice: "auto")
+          parameters: hash_not_including(:tool_choice)
         )
 
         client.chat("test prompt")
       end
     end
   end
-end 
+end
