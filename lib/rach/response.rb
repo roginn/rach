@@ -1,9 +1,10 @@
 module Rach
   class Response
-    attr_reader :raw_response
+    attr_reader :raw_response, :request_params
 
-    def initialize(response)
+    def initialize(response, request_params = nil)
       @raw_response = response
+      @request_params = request_params
     end
 
     def content
@@ -61,6 +62,22 @@ module Rach
     def on_content(&block)
       block.call(content) if content
       self
+    end
+
+    def id
+      @raw_response["id"]
+    end
+
+    def model
+      @raw_response["model"]
+    end
+
+    def created_at
+      Time.at(@raw_response["created"]) if @raw_response["created"]
+    end
+
+    def system_fingerprint
+      @raw_response["system_fingerprint"]
     end
 
     private

@@ -8,22 +8,24 @@ module Rach
       @tracker = UsageTracker.new
     end
 
-    def chat(prompt, response_format: nil, tools: nil)
+    def chat(prompt, response_format: nil, tools: nil, model: @model, temperature: 0)
       messages = format_messages(prompt)
       formatted_tools = tools&.map(&:function_schema)
-      
+
+      request_params = {
+        model:,
+        messages: messages,
+        response_format: response_format,
+        temperature:,
+        tools: formatted_tools,
+        tool_choice: tools ? "required" : nil,
+      }.compact
+
       response = Response.new(
-        @client.chat(
-          parameters: {
-            model: @model,
-            messages:,
-            response_format:,
-            tools: formatted_tools,
-            tool_choice: tools ? "required" : "auto",
-          }.compact
-        )
+        @client.chat(parameters: request_params),
+        request_params
       )
-      
+
       @tracker.track(response)
       response
     end
