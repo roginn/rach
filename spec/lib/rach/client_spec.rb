@@ -116,5 +116,51 @@ RSpec.describe Rach::Client do
         }.to raise_error(ArgumentError, "No model specified")
       end
     end
+
+    context "when tools are provided" do
+      let(:tool) do
+        Class.new do
+          include Rach::Function
+
+          def function_name
+            "test_tool"
+          end
+
+          def function_description
+            "A test tool"
+          end
+
+          def schema
+            object do
+              # Empty object schema to match original test
+            end
+          end
+
+          def execute(**args)
+            # Test implementation
+          end
+        end
+      end
+
+      it "sets tool_choice to 'required' when tools are present" do
+        client = described_class.new(access_token: "fake-token")
+
+        expect_any_instance_of(OpenAI::Client).to receive(:chat).with(
+          parameters: hash_including(tool_choice: "required")
+        )
+
+        client.chat("test prompt", tools: [tool])
+      end
+
+      it "sets tool_choice to nil when tools are not present" do
+        client = described_class.new(access_token: "fake-token")
+
+        expect_any_instance_of(OpenAI::Client).to receive(:chat).with(
+          parameters: hash_not_including(:tool_choice)
+        )
+
+        client.chat("test prompt")
+      end
+    end
   end
-end 
+end
