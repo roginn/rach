@@ -21,5 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", ">= 1.0", "< 3"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_dependency "ruby-openai", "~> 7.3"
+  spec.add_dependency "anthropic", "~> 0.3.0"
   # Add other dependencies as needed
 end

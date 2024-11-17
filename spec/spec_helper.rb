@@ -1,4 +1,5 @@
 require 'dotenv'
+require 'pry'
 Dotenv.load
 
 require_relative '../lib/rach'
