@@ -2,13 +2,13 @@ module Rach
   class Client
     attr_reader :tracker, :client, :model
 
-    def initialize(access_token:, model: "gpt-4o-mini")
-      @client = OpenAI::Client.new(log_errors: true, access_token: access_token)
+    def initialize(access_token:, model: "gpt-4o-mini", **kwargs)
+      @client = OpenAI::Client.new(log_errors: true, access_token: access_token, **kwargs)
       @model = model
       @tracker = UsageTracker.new
     end
 
-    def chat(prompt, response_format: nil, tools: nil, model: @model, temperature: 0)
+    def chat(prompt, response_format: nil, tools: nil, model: @model, temperature: nil)
       messages = format_messages(prompt)
       formatted_tools = tools&.map(&:function_schema)
 
