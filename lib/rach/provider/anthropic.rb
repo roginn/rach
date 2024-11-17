@@ -6,7 +6,7 @@ module Rach
         @client = create_client(access_token, **kwargs)
       end
 
-      def chat(parameters)
+      def chat(**parameters)
         @client.messages(**parameters)
       end
 

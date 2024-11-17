@@ -15,6 +15,7 @@ require_relative "rach/provider/base"
 require_relative "rach/provider/openai"
 require_relative "rach/provider/anthropic"
 require_relative "rach/provider"
+require_relative "rach/prompt"
 
 module Rach
   # Your code goes here...

@@ -13,7 +13,7 @@ module Rach
         raise NotImplementedError
       end
 
-      def chat(parameters)
+      def chat(**parameters)
         raise NotImplementedError
       end
 
