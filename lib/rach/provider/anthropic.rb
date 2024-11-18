@@ -37,8 +37,6 @@ module Rach
           system: system_message&.[](:content)
         }.compact
 
-        puts "Anthropic request params: #{anthropic_params.inspect}" # Debug line
-
         raw_response = @client.messages(
           parameters: {
             model: anthropic_params[:model],
