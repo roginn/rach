@@ -123,6 +123,30 @@ response.tool_calls
 #   "function"=>{"name"=>"get_current_weather", "arguments"=>"{\"location\":\"San Francisco, CA\",\"unit\":\"celsius\"}"}}]
 ```
 
+### Multiple Providers
+
+Rach supports using multiple providers in your application. You can configure different providers and their parameters when creating a client:
+
+```ruby
+client = Rach::Client.new(
+  providers: {
+    openai: {
+      access_token: YOUR_OPENAI_API_KEY
+    },
+    anthropic: {
+      access_token: YOUR_ANTHROPIC_API_KEY
+    }
+  }
+)
+
+# Use specific provider
+response = client.chat("Hello!", model: "gpt-4o")
+puts response.content
+
+# Switch to another provider
+response = client.chat("Hi there!", model: "claude-3-5-sonnet-20241022")
+puts response.content
+```
 
 ## License
 
