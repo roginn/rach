@@ -15,7 +15,7 @@ module Rach
 
     def self.create_client(provider_key, access_token)
       provider_class = get_provider_class(provider_key)
-      provider_class.new(access_token)
+      provider_class.new(access_token:)
     end
 
     def self.get_provider_class(key)

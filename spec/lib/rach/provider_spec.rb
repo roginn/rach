@@ -28,12 +28,12 @@ RSpec.describe Rach::Provider do
     let(:access_token) { 'test-token' }
 
     it 'creates an OpenAI client' do
-      expect(Rach::Provider::OpenAI).to receive(:new).with(access_token)
+      expect(Rach::Provider::OpenAI).to receive(:new).with(access_token:)
       described_class.create_client(:openai, access_token)
     end
 
     it 'creates an Anthropic client' do
-      expect(Rach::Provider::Anthropic).to receive(:new).with(access_token)
+      expect(Rach::Provider::Anthropic).to receive(:new).with(access_token:)
       described_class.create_client(:anthropic, access_token)
     end
 

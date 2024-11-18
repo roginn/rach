@@ -4,7 +4,7 @@ module Rach
   module Provider
     class Anthropic < Base
 
-      def initialize(access_token, **kwargs)
+      def initialize(access_token: nil, **kwargs)
         @client = create_client(access_token, **kwargs)
       end
 

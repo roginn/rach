@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Rach::Provider::Anthropic do
   let(:access_token) { "test_token" }
   let(:anthropic_client) { instance_double(Anthropic::Client) }
-  let(:provider) { described_class.new(access_token) }
+  let(:provider) { described_class.new(access_token:) }
 
   let(:default_response) do
     {

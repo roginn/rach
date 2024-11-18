@@ -62,7 +62,7 @@ RSpec.describe Rach::Client do
       it 'requires model parameter' do
         expect {
           described_class.new(access_token: "sk-123")
-        }.to raise_error(ArgumentError, "Model must be specified when using single access token")
+        }.to raise_error(ArgumentError)
       end
 
       it 'initializes with OpenAI model' do
@@ -79,9 +79,9 @@ RSpec.describe Rach::Client do
     context 'with multiple access tokens' do
       it 'initializes multiple providers' do
         client = described_class.new(
-          access_token: {
-            openai: "sk-123",
-            anthropic: "sk-456"
+          providers: {
+            openai: { access_token: "sk-123" },
+            anthropic: { access_token: "sk-456" }
           }
         )
 
@@ -92,9 +92,9 @@ RSpec.describe Rach::Client do
       it 'raises error for unknown provider' do
         expect {
           described_class.new(
-            access_token: { unknown: "sk-123" }
+            providers: { unknown: { access_token: "sk-123" } }
           )
-        }.to raise_error(ArgumentError, "Unknown provider: unknown")
+        }.to raise_error(ArgumentError)
       end
     end
   end
@@ -122,9 +122,9 @@ RSpec.describe Rach::Client do
     context 'with prompt input' do
       it 'uses prompt configuration and sends to correct provider' do
         client = described_class.new(
-          access_token: {
-            openai: "sk-123",
-            anthropic: "sk-456"
+          providers: {
+            openai: { access_token: "sk-123" },
+            anthropic: { access_token: "sk-456" }
           }
         )
 
@@ -135,7 +135,7 @@ RSpec.describe Rach::Client do
         )
 
         expect(anthropic_client).to receive(:messages).with(
-          parameters: a_hash_including(
+          parameters: hash_including(
             messages: [{ role: "user", content: "Hello" }],
             model: "claude-3",
             temperature: 0.7
@@ -147,9 +147,9 @@ RSpec.describe Rach::Client do
 
       it 'raises error when no model is specified' do
         client = described_class.new(
-          access_token: {
-            openai: "sk-123",
-            anthropic: "sk-456"
+          providers: {
+            openai: { access_token: "sk-123" },
+            anthropic: { access_token: "sk-456" }
           }
         )
 

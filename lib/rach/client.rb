@@ -2,19 +2,18 @@ module Rach
   class Client
     attr_reader :tracker, :client, :model, :providers
 
-    def initialize(access_token:, model: nil, **kwargs)
+    def initialize(providers: nil, access_token: nil, model: nil, **kwargs)
       @tracker = UsageTracker.new
       @providers = {}
 
-      if access_token.is_a?(Hash)
-        # access_token: { openai: "sk-...", anthropic: "sk-..." }
-        setup_providers(access_token)
-      else
-        raise ArgumentError, "Model must be specified when using single access token" unless model
+      if providers
+        setup_providers(providers)
+      elsif access_token && model
         @default_model = model
-
         provider = Provider.for(model)
-        setup_providers({ provider.key => access_token })
+        setup_providers({ provider.key => { access_token: access_token } })
+      else
+        raise ArgumentError, "Either (providers) or (access_token AND model) must be provided"
       end
     end
 
@@ -44,10 +43,10 @@ module Rach
 
     private
 
-    def setup_providers(provider_tokens)
-      provider_tokens.each do |provider_key, token|
+    def setup_providers(provider_configs)
+      provider_configs.each do |provider_key, config|
         provider_class = Provider.get_provider_class(provider_key)
-        @providers[provider_class.key] = provider_class.new(token)
+        @providers[provider_class.key] = provider_class.new(**config)
       end
     end
   end
