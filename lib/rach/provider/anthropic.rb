@@ -24,7 +24,19 @@ module Rach
           max_tokens:, # mandatory!
         }
 
-        @client.messages(parameters: anthropic_params)
+        raw_response = @client.messages(parameters: anthropic_params)
+        Response.new(
+          id: raw_response["id"],
+          model: raw_response["model"],
+          content: raw_response.dig("content", 0, "text"),
+          tool_calls: nil,
+          usage: {
+            "prompt_tokens" => raw_response["usage"]["input_tokens"],
+            "completion_tokens" => raw_response["usage"]["output_tokens"],
+            "total_tokens" => raw_response["usage"]["input_tokens"] + raw_response["usage"]["output_tokens"]
+          },
+          raw_response: raw_response
+        )
       end
 
       def self.supports?(model)
@@ -38,6 +50,10 @@ module Rach
           access_token: access_token,
           **kwargs
         )
+      end
+
+      def parse_response(response)
+        response.dig(:content, 0, :text)
       end
     end
   end

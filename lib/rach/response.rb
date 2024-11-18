@@ -1,18 +1,18 @@
 module Rach
   class Response
-    attr_reader :raw_response, :request_params
+    attr_reader :id, :model, :created_at, :content, :tool_calls, :usage, 
+                :system_fingerprint, :raw_response, :request_params
 
-    def initialize(response, request_params = nil)
-      @raw_response = response
-      @request_params = request_params
-    end
-
-    def content
-      message&.dig("content")
-    end
-
-    def tool_calls
-      message&.dig("tool_calls")
+    def initialize(**options)
+      @id = options[:id]
+      @model = options[:model]
+      @created_at = options[:created_at]
+      @content = options[:content]
+      @tool_calls = options[:tool_calls]
+      @usage = options[:usage]
+      @system_fingerprint = options[:system_fingerprint]
+      @raw_response = options[:raw_response]
+      @request_params = options[:request_params]
     end
 
     def function_call?
@@ -29,10 +29,6 @@ module Rach
       JSON.parse(tool_calls.first.dig("function", "arguments"))
     rescue JSON::ParserError
       raise ParseError, "Function arguments are not valid JSON"
-    end
-
-    def usage
-      @raw_response["usage"]
     end
 
     def prompt_tokens
@@ -64,27 +60,7 @@ module Rach
       self
     end
 
-    def id
-      @raw_response["id"]
-    end
-
-    def model
-      @raw_response["model"]
-    end
-
-    def created_at
-      Time.at(@raw_response["created"]) if @raw_response["created"]
-    end
-
-    def system_fingerprint
-      @raw_response["system_fingerprint"]
-    end
-
     private
-
-    def message
-      @raw_response.dig("choices", 0, "message")
-    end
 
     def to_json
       JSON.parse(content)

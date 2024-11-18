@@ -36,10 +36,7 @@ module Rach
         tool_choice: prompt.tools ? "required" : nil,
       }.compact
 
-      response = Response.new(
-        client.chat(parameters: request_params),
-        request_params
-      )
+      response = client.chat(parameters: request_params)
 
       tracker.track(response)
       response

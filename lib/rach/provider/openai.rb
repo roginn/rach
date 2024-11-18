@@ -7,7 +7,17 @@ module Rach
       end
 
       def chat(**parameters)
-        @client.chat(**parameters)
+        raw_response = @client.chat(**parameters)
+        Response.new(
+          id: raw_response["id"],
+          model: raw_response["model"],
+          created_at: Time.at(raw_response["created"]),
+          content: raw_response.dig("choices", 0, "message", "content"),
+          tool_calls: raw_response.dig("choices", 0, "message", "tool_calls"),
+          usage: raw_response["usage"],
+          system_fingerprint: raw_response["system_fingerprint"],
+          raw_response: raw_response
+        )
       end
 
       def self.supports?(model)

@@ -5,11 +5,56 @@ RSpec.describe Rach::Client do
   let(:openai_client) { instance_double(OpenAI::Client) }
   let(:anthropic_client) { instance_double(Anthropic::Client) }
 
+  let(:openai_mock_response) do
+    {
+      "id" => "chat_123",
+      "object" => "chat.completion",
+      "created" => Time.now.to_i,
+      "model" => "gpt-4o-mini",
+      "choices" => [{
+        "index" => 0,
+        "message" => {
+          "role" => "assistant",
+          "content" => "Test response"
+        },
+        "finish_reason" => "stop"
+      }],
+      "usage" => {
+        "prompt_tokens" => 10,
+        "completion_tokens" => 20,
+        "total_tokens" => 30
+      }
+    }
+  end
+
+  let(:anthropic_mock_response) do
+    {
+      "id" => "msg_01LYzbmmUAcy9gUt65W5iVdF",
+      "type" => "message",
+      "role" => "assistant",
+      "model" => "claude-3-5-sonnet-20241022",
+      "content" => [
+        {
+          "type" => "text",
+          "text" => "Test response"
+        }
+      ],
+      "stop_reason" => "end_turn",
+      "stop_sequence" => nil,
+      "usage" => {
+        "input_tokens" => 10,
+        "output_tokens" => 20
+      }
+    }
+  end
+
   before do
     allow(Rach::UsageTracker).to receive(:new).and_return(tracker)
     allow(tracker).to receive(:track)
     allow(OpenAI::Client).to receive(:new).and_return(openai_client)
     allow(Anthropic::Client).to receive(:new).and_return(anthropic_client)
+    allow(openai_client).to receive(:chat).and_return(openai_mock_response)
+    allow(anthropic_client).to receive(:messages).and_return(anthropic_mock_response)
   end
 
   describe '#initialize' do
