@@ -26,9 +26,10 @@ $ gem install rach
 
 ```ruby
 require 'rach'
-client = Rach::Client.new(access_token: YOUR_OPENAI_API_KEY)
+client = Rach::Client.new(access_token: YOUR_OPENAI_API_KEY, model: "gpt-4o")
 response = client.chat("Hello, how are you?")
 puts response.content
+# => "Hello! I'm just a computer program, so I don't have feelings, but I'm here and ready to help you. How can I assist you today?"
 ```
 
 ### Conversations
@@ -38,7 +39,7 @@ Rach supports stateful conversations with memory:
 ```ruby
 require 'rach'
 
-client = Rach::Client.new(access_token: YOUR_OPENAI_API_KEY)
+client = Rach::Client.new(access_token: YOUR_OPENAI_API_KEY, model: "gpt-4o")
 convo = Rach::Conversation.new
 convo.system "You teach the German language."
 convo.user "Translate: There are two birds singing outside my window."
@@ -47,17 +48,19 @@ response = client.chat(convo)
 response.content
 # => "Es gibt zwei Vögel, die draußen vor meinem Fenster singen."
 
-convo.add_response(response)
-
 # Continue the conversation...
+convo.add_response(response)
 convo.user "What are the verbs in your translation?"
-client.chat(convo)
-
+response = client.chat(convo)
+response.content
+# => "The verbs in the translation \"Es gibt zwei Vögel, die vor meinem Fenster singen\" are \"gibt\" and \"singen.\""
 
 # Remove the last message from the conversation history and continue
 convo.pop
 convo.user "Explain the structure of your translation."
-client.chat(convo)
+response = client.chat(convo)
+response.content
+# => "Your last message to me was: \"Translate: There are two birds singing outside my window.\""
 ```
 
 ### Response Formatting

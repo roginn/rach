@@ -7,7 +7,24 @@ module Rach
       end
 
       def chat(**parameters)
-        @client.messages(**parameters)
+        # Extract system message if present
+        messages = parameters.dig(:parameters, :messages) || []
+        system_message = messages.find { |msg| msg[:role] == "system" }
+
+        # Remove system message from messages array if present
+        messages = messages.reject { |msg| msg[:role] == "system" } if system_message
+
+        temperature = (parameters.dig(:parameters, :temperature) || 1).clamp(0, 1)
+        max_tokens = parameters.dig(:parameters, :max_tokens) || 1024
+
+        anthropic_params = {
+          **parameters[:parameters],
+          messages:,
+          temperature:,
+          max_tokens:, # mandatory!
+        }
+
+        @client.messages(parameters: anthropic_params)
       end
 
       def self.supports?(model)

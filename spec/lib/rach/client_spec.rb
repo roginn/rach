@@ -90,9 +90,9 @@ RSpec.describe Rach::Client do
         )
 
         expect(anthropic_client).to receive(:messages).with(
-          parameters: hash_including(
-            model: "claude-3",
+          parameters: a_hash_including(
             messages: [{ role: "user", content: "Hello" }],
+            model: "claude-3",
             temperature: 0.7
           )
         )
