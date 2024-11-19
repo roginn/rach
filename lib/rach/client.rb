@@ -51,7 +51,7 @@ module Rach
     def setup_providers(provider_configs)
       provider_configs.each do |provider_key, config|
         provider_class = Provider.get_provider_class(provider_key)
-        @providers[provider_class.key] = provider_class.new(**config, logger: @logger)
+        @providers[provider_class.key] = provider_class.new(logger: @logger, **config)
       end
     end
   end

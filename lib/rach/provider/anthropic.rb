@@ -1,10 +1,11 @@
 require 'securerandom'
+require 'json'
 
 module Rach
   module Provider
     class Anthropic < Base
 
-      def initialize(access_token: nil, logger: nil,**kwargs)
+      def initialize(access_token: nil, logger: nil, **kwargs)
         @client = create_client(access_token, **kwargs)
         @logger = logger
       end
@@ -56,6 +57,11 @@ module Rach
           #   tool_choice: anthropic_params[:tool_choice],
           # }.compact
         )
+
+        if @logger
+          @logger.info("Request to Anthropic: #{JSON.pretty_generate(anthropic_params)}")
+          @logger.info("Response: #{JSON.pretty_generate(raw_response)}")
+        end
 
         Response.new(
           id: raw_response["id"],

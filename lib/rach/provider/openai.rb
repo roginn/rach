@@ -8,13 +8,12 @@ module Rach
       end
 
       def chat(**parameters)
+        raw_response = @client.chat(**parameters)
 
         if @logger
-          @logger.info("Making API call to OpenAI")
-          @logger.info("Request parameters: #{parameters.inspect}")
+          @logger.info("Request to OpenAI: #{JSON.pretty_generate(parameters)}")
+          @logger.info("Response: #{JSON.pretty_generate(raw_response)}")
         end
-
-        raw_response = @client.chat(**convert_params(parameters))
 
         Response.new(
           id: raw_response["id"],
