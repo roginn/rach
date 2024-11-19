@@ -148,6 +148,45 @@ response = client.chat("Hi there!", model: "claude-3-5-sonnet-20241022")
 puts response.content
 ```
 
+### Logging
+
+Rach supports logging of API calls and their parameters. You can provide any logger that responds to the `info` method:
+
+```ruby
+require 'logger'
+
+# Create a logger that writes to STDOUT
+logger = Logger.new(STDOUT)
+
+# Pass the logger when creating the client
+client = Rach::Client.new(
+  access_token: YOUR_OPENAI_API_KEY,
+  model: "gpt-4",
+  logger: logger
+)
+
+# Now when you make API calls, parameters will be logged
+client.chat("Hello!")
+# [2024-01-20T10:30:00.000Z] INFO: Making API call to openai
+# [2024-01-20T10:30:00.000Z] INFO: Request parameters: {:model=>"gpt-4", :messages=>[{:role=>"user", :content=>"Hello!"}], :temperature=>1.0}
+```
+
+You can also use your own custom logger as long as it responds to the `info` method:
+
+```ruby
+class CustomLogger
+  def info(message)
+    puts "[RACH] #{message}"
+  end
+end
+
+client = Rach::Client.new(
+  access_token: YOUR_OPENAI_API_KEY,
+  model: "gpt-4",
+  logger: CustomLogger.new
+)
+```
+
 ## License
 
 Rach is available as open source under the terms of the MIT License.

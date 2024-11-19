@@ -187,6 +187,51 @@ RSpec.describe Rach::Provider::Anthropic do
         provider.chat(**parameters)
       end
     end
+
+    context "when using function calls" do
+      let(:client) { described_class.new(access_token: "fake-token") }
+      let(:anthropic_client) { instance_double(Anthropic::Client) }
+      let(:function_params) do
+        {
+          parameters: {
+            model: "claude-3-sonnet",
+            messages: [{ role: "user", content: "Hello" }],
+            tools: [{
+              function: {
+                name: "send_message",
+                description: "Send a message",
+                parameters: {
+                  properties: {
+                    message: { type: "string" }
+                  },
+                  required: ["message"]
+                }
+              }
+            }]
+          }
+        }
+      end
+
+      before do
+        allow(Anthropic::Client).to receive(:new).and_return(anthropic_client)
+        allow(anthropic_client).to receive(:messages).and_return({
+          "id" => "msg_123",
+          "model" => "claude-3-sonnet",
+          "content" => [{ "type" => "text", "text" => "Hello" }],
+          "usage" => { "input_tokens" => 10, "output_tokens" => 5 }
+        })
+      end
+
+      it "includes tool_choice in the request when tools are present" do
+        expect(anthropic_client).to receive(:messages).with(
+          parameters: hash_including(
+            tool_choice: { type: "tool", name: "send_message" }
+          )
+        )
+
+        client.chat(**function_params)
+      end
+    end
   end
 
   describe '.supports?' do

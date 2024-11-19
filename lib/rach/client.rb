@@ -1,10 +1,12 @@
 module Rach
   class Client
     attr_reader :tracker, :client, :model, :providers
+    attr_accessor :logger
 
-    def initialize(providers: nil, access_token: nil, model: nil, **kwargs)
+    def initialize(providers: nil, access_token: nil, model: nil, logger: nil, **kwargs)
       @tracker = UsageTracker.new
       @providers = {}
+      @logger = logger
 
       if providers
         setup_providers(providers)
@@ -26,17 +28,20 @@ module Rach
       provider_key = Provider.for(model).key
       client = @providers[provider_key]
 
+      # Filter out options that are already handled by Prompt
+      filtered_options = options.reject { |k, _| [:model, :temperature, :response_format, :tools].include?(k) }
+
       request_params = {
         model:,
         messages: prompt.to_messages,
         response_format: prompt.response_format,
         temperature: prompt.temperature,
         tools: prompt.tools&.map(&:function_schema),
-        tool_choice: prompt.tools ? "required" : nil,
+        **filtered_options  # Pass through remaining options to the underlying client
       }.compact
 
-      response = client.chat(parameters: request_params)
 
+      response = client.chat(parameters: request_params)
       tracker.track(response)
       response
     end
@@ -46,7 +51,7 @@ module Rach
     def setup_providers(provider_configs)
       provider_configs.each do |provider_key, config|
         provider_class = Provider.get_provider_class(provider_key)
-        @providers[provider_class.key] = provider_class.new(**config)
+        @providers[provider_class.key] = provider_class.new(**config, logger: @logger)
       end
     end
   end

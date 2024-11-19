@@ -4,8 +4,9 @@ module Rach
   module Provider
     class Anthropic < Base
 
-      def initialize(access_token: nil, **kwargs)
+      def initialize(access_token: nil, logger: nil,**kwargs)
         @client = create_client(access_token, **kwargs)
+        @logger = logger
       end
 
       def chat(**parameters)
@@ -34,18 +35,26 @@ module Rach
           temperature:,
           max_tokens:,
           tools:,
+          tool_choice: convert_tool_choice(tools),
           system: system_message&.[](:content)
         }.compact
 
+        if @logger
+          @logger.info("Making API call to Anthropic")
+          @logger.info("Request parameters: #{anthropic_params.inspect}")
+        end
+
         raw_response = @client.messages(
-          parameters: {
-            model: anthropic_params[:model],
-            messages: anthropic_params[:messages],
-            system: anthropic_params[:system],
-            temperature: anthropic_params[:temperature],
-            max_tokens: anthropic_params[:max_tokens],
-            tools: anthropic_params[:tools]
-          }.compact
+          parameters: anthropic_params.compact
+          # parameters: {
+          #   model: anthropic_params[:model],
+          #   messages: anthropic_params[:messages],
+          #   system: anthropic_params[:system],
+          #   temperature: anthropic_params[:temperature],
+          #   max_tokens: anthropic_params[:max_tokens],
+          #   tools: anthropic_params[:tools],
+          #   tool_choice: anthropic_params[:tool_choice],
+          # }.compact
         )
 
         Response.new(
@@ -75,10 +84,10 @@ module Rach
         )
       end
 
-      def convert_tools(openai_functions)
-        return nil if openai_functions.nil?
+      def convert_tools(functions)
+        return nil if functions.nil?
 
-        openai_functions.map do |fn|
+        functions.map do |fn|
           {
             name: fn[:function][:name],
             description: fn[:function][:description],
@@ -106,6 +115,18 @@ module Rach
               "arguments" => call["input"].to_json
             }
           }
+        end
+      end
+
+      def convert_tool_choice(tools)
+        if tools
+          if tools.size == 1
+            { type: "tool", name: tools.first[:name] }
+          else
+            { type: "any" }
+          end
+        else
+          nil
         end
       end
     end

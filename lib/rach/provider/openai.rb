@@ -2,12 +2,20 @@ module Rach
   module Provider
     class OpenAI < Base
 
-      def initialize(access_token: nil, **kwargs)
+      def initialize(access_token: nil, logger: nil, **kwargs)
         @client = create_client(access_token, **kwargs)
+        @logger = logger
       end
 
       def chat(**parameters)
-        raw_response = @client.chat(**parameters)
+
+        if @logger
+          @logger.info("Making API call to OpenAI")
+          @logger.info("Request parameters: #{parameters.inspect}")
+        end
+
+        raw_response = @client.chat(**convert_params(parameters))
+
         Response.new(
           id: raw_response["id"],
           model: raw_response["model"],
@@ -32,6 +40,15 @@ module Rach
           log_errors: true,
           **kwargs
         )
+      end
+
+      def convert_params(parameters)
+        {
+          parameters: {
+            **parameters[:parameters],
+            tool_choice: parameters.dig(:parameters, :tools) ? "required" : nil
+          }.compact
+        }
       end
     end
   end
