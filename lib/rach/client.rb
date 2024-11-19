@@ -7,11 +7,11 @@ module Rach
       @tracker = UsageTracker.new
       @providers = {}
       @logger = logger
+      @default_model = model
 
       if providers
         setup_providers(providers)
       elsif access_token && model
-        @default_model = model
         provider = Provider.for(model)
         setup_providers({ provider.key => { access_token: access_token } })
       else
