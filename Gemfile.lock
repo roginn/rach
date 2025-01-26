@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    rach (0.2.5)
+    rach (0.2.7)
       anthropic (~> 0.3.0)
+      json-schema_builder (~> 0.8)
       ruby-openai (~> 7.3)
 
 GEM
