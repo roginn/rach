@@ -8,6 +8,7 @@ module Rach
       end
 
       def chat(**parameters)
+        parameters = convert_params(parameters)
         raw_response = @client.chat(**parameters)
 
         if @logger
