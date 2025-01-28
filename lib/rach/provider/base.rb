@@ -1,8 +1,11 @@
 module Rach
   module Provider
     class Base
-      def initialize(access_token, **kwargs)
-        @client = create_client(access_token, **kwargs)
+      attr_reader :client, :logger
+
+      def initialize(access_token: nil, logger: nil, **config)
+        @logger = logger
+        @client = create_client(access_token, **config)
       end
 
       def self.key
@@ -19,7 +22,7 @@ module Rach
 
       private
 
-      def create_client(access_token, **kwargs)
+      def create_client(access_token, **config)
         raise NotImplementedError
       end
     end

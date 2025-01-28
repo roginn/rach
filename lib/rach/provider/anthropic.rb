@@ -83,11 +83,13 @@ module Rach
 
       private
 
-      def create_client(access_token, **kwargs)
-        ::Anthropic::Client.new(
-          access_token: access_token,
-          **kwargs
-        )
+      def create_client(access_token, **config)
+        client_config = {
+          access_token: access_token
+        }
+        client_config.merge!(config)
+
+        ::Anthropic::Client.new(**client_config)
       end
 
       def convert_tools(functions)

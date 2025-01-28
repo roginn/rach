@@ -154,6 +154,29 @@ response = client.chat("Hi there!", model: "claude-3-5-sonnet-20241022")
 puts response.content
 ```
 
+Rach uses the gems `ruby-openai` and `anthropic` to make API calls to each provider. You can configure the providers separately in the `providers` hash, and they will be used in the respective clients:
+
+```ruby
+client = Rach::Client.new(
+  providers: {
+    openai: {
+      access_token: YOUR_OPENAI_API_KEY,
+      uri_base: "https://oai.hconeai.com/",
+       extra_headers: {
+        "X-Proxy-TTL" => "43200",
+        "X-Proxy-Refresh": "true",
+        "Helicone-Auth": "Bearer HELICONE_API_KEY",
+        "helicone-stream-force-format" => "true",
+      }
+    },
+    anthropic: {
+      access_token: YOUR_ANTHROPIC_API_KEY,
+      request_timeout: 240
+    }
+  }
+)
+```
+
 ### Logging
 
 Rach supports logging of API calls and their parameters. You can provide any logger that responds to the `info` method:
