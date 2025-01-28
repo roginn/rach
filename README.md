@@ -41,26 +41,32 @@ require 'rach'
 
 client = Rach::Client.new(access_token: YOUR_OPENAI_API_KEY, model: "gpt-4o")
 convo = Rach::Conversation.new
-convo.system "You teach the German language."
-convo.user "Translate: There are two birds singing outside my window."
 
+convo.system "You are a helpful historian."
+
+# 1. First user question
+convo.user "When was the Statue of Liberty dedicated? Provide only the year."
 response = client.chat(convo)
-response.content
-# => "Es gibt zwei Vögel, die draußen vor meinem Fenster singen."
+puts response.content
+# => "1886"
 
-# Continue the conversation...
+# 2. Add the response to the conversation
 convo.add_response(response)
-convo.user "What are the verbs in your translation?"
-response = client.chat(convo)
-response.content
-# => "The verbs in the translation \"Es gibt zwei Vögel, die vor meinem Fenster singen\" are \"gibt\" and \"singen.\""
 
-# Remove the last message from the conversation history and continue
-convo.pop
-convo.user "Explain the structure of your translation."
+# 3. Continue the conversation (the answer references the original fact: 1886)
+convo.user "Name a major city that was incorporated in that year"
 response = client.chat(convo)
-response.content
-# => "Your last message to me was: \"Translate: There are two birds singing outside my window.\""
+puts response.content
+# => "Vancouver"
+
+# 4. Remove the most recent user message ("Name a major city...")
+convo.pop
+
+# 5. Ask a new question that references the Statue of Liberty, not Vancouver
+convo.user "Why was it built?"
+response = client.chat(convo)
+puts response.content
+# => "The Statue of Liberty was built to commemorate the 100th anniversary of the signing of the Declaration of Independence."
 ```
 
 ### Response Formatting
