@@ -135,4 +135,74 @@ RSpec.describe Rach::Function do
       )
     end
   end
+
+  describe 'multiple function calls' do
+    # Create a test memory function class
+    class TestMemoryFunction
+      include Rach::Function
+
+      def function_name
+        "update_memory"
+      end
+
+      def function_description
+        "Update memory with new information"
+      end
+
+      def schema
+        object do
+          string :operation, description: "The operation to perform", enum: ["create", "update"]
+          integer :key, description: "The memory key"
+          string :value, description: "The memory value"
+        end
+      end
+
+      def execute(**args)
+        # Test implementation
+        { status: "success", operation: args[:operation], key: args[:key] }
+      end
+    end
+
+    it 'executes multiple function calls' do
+      response = Rach::Response.new(
+        tool_calls: [
+          {
+            "id" => "call_1",
+            "type" => "function",
+            "function" => {
+              "name" => "update_memory",
+              "arguments" => JSON.dump({
+                operation: "update",
+                key: 0,
+                value: "First memory update"
+              })
+            }
+          },
+          {
+            "id" => "call_2",
+            "type" => "function",
+            "function" => {
+              "name" => "update_memory",
+              "arguments" => JSON.dump({
+                operation: "create",
+                key: 1,
+                value: "Second memory creation"
+              })
+            }
+          }
+        ]
+      )
+
+      call_count = 0
+      response.on_function(TestMemoryFunction) do |function, args|
+        call_count += 1
+        result = function.execute(**args)
+        expect(result[:status]).to eq("success")
+        expect(result[:operation]).to eq(args[:operation])
+        expect(result[:key]).to eq(args[:key])
+      end
+
+      expect(call_count).to eq(2)
+    end
+  end
 end

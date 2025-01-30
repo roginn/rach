@@ -34,12 +34,14 @@ module Rach
 
       private
 
-      def create_client(access_token, **kwargs)
-        ::OpenAI::Client.new(
+      def create_client(access_token, **config)
+        client_config = {
           access_token: access_token,
-          log_errors: true,
-          **kwargs
-        )
+          log_errors: true
+        }
+        client_config.merge!(config)
+
+        ::OpenAI::Client.new(**client_config)
       end
 
       def convert_params(parameters)

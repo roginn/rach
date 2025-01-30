@@ -97,6 +97,102 @@ RSpec.describe Rach::Client do
         }.to raise_error(ArgumentError)
       end
     end
+
+    context 'with provider-specific configuration' do
+      it 'passes OpenAI configuration correctly' do
+        openai_config = {
+          access_token: "sk-123",
+          uri_base: "https://custom-openai.com",
+          request_timeout: 120,
+          extra_headers: {
+            "X-Custom-Header" => "value",
+            "X-Proxy-TTL" => "43200"
+          }
+        }
+
+        expect(OpenAI::Client).to receive(:new).with(
+          hash_including(
+            access_token: "sk-123",
+            uri_base: "https://custom-openai.com",
+            request_timeout: 120,
+            extra_headers: {
+              "X-Custom-Header" => "value",
+              "X-Proxy-TTL" => "43200"
+            }
+          )
+        )
+
+        described_class.new(
+          providers: {
+            openai: openai_config
+          }
+        )
+      end
+
+      it 'passes Anthropic configuration correctly' do
+        anthropic_config = {
+          access_token: "sk-456",
+          request_timeout: 240,
+          api_url: "https://custom-anthropic.com",
+          max_retries: 3
+        }
+
+        expect(Anthropic::Client).to receive(:new).with(
+          hash_including(
+            access_token: "sk-456",
+            request_timeout: 240,
+            api_url: "https://custom-anthropic.com",
+            max_retries: 3
+          )
+        )
+
+        described_class.new(
+          providers: {
+            anthropic: anthropic_config
+          }
+        )
+      end
+
+      it 'initializes multiple providers with different configurations' do
+        openai_config = {
+          access_token: "sk-123",
+          uri_base: "https://custom-openai.com",
+          extra_headers: { "X-Custom-Header" => "value" }
+        }
+
+        anthropic_config = {
+          access_token: "sk-456",
+          request_timeout: 240,
+          api_url: "https://custom-anthropic.com"
+        }
+
+        expect(OpenAI::Client).to receive(:new).with(
+          hash_including(
+            access_token: "sk-123",
+            uri_base: "https://custom-openai.com",
+            extra_headers: { "X-Custom-Header" => "value" }
+          )
+        )
+
+        expect(Anthropic::Client).to receive(:new).with(
+          hash_including(
+            access_token: "sk-456",
+            request_timeout: 240,
+            api_url: "https://custom-anthropic.com"
+          )
+        )
+
+        client = described_class.new(
+          providers: {
+            openai: openai_config,
+            anthropic: anthropic_config
+          }
+        )
+
+        expect(client.providers[:openai]).to be_a(Rach::Provider::OpenAI)
+        expect(client.providers[:anthropic]).to be_a(Rach::Provider::Anthropic)
+      end
+    end
   end
 
   describe "#chat" do
