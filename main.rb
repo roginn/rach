@@ -130,6 +130,5 @@ end.on_content do |content|
   puts "Content: #{content}"
 end
 
-binding.pry
 puts response.content
 
