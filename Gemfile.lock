@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rach (0.2.8)
+    rach (0.2.9)
       anthropic (~> 0.3.0)
       gemini-ai (~> 4.2.0)
       json-schema_builder (~> 0.8)
