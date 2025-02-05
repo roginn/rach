@@ -3,7 +3,8 @@ module Rach
 
     AVAILABLE_PROVIDERS = [
       Provider::OpenAI,
-      Provider::Anthropic
+      Provider::Anthropic,
+      Provider::Google
     ].to_h { |p| [p.key, p] }.freeze
 
     def self.for(model)
