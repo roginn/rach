@@ -30,12 +30,14 @@ RSpec.describe Rach::Provider::Google do
     }
   end
 
-  before do
-    allow(Gemini).to receive(:new).and_return(gemini_client)
-    allow(gemini_client).to receive(:generate_content).and_return(default_response)
-  end
-
   describe '#chat' do
+    before do
+      allow(Gemini).to receive(:new).and_return(gemini_client)
+      allow(gemini_client).to receive(:generate_content).and_return(default_response)
+      allow(gemini_client).to receive(:model).and_return("gemini-2.0-flash")
+      allow(gemini_client).to receive(:model=)
+    end
+
     context 'with basic message' do
       let(:parameters) do
         {
@@ -140,6 +142,28 @@ RSpec.describe Rach::Provider::Google do
     it 'returns false for non-Gemini models' do
       expect(described_class.supports?("gpt-4")).to be false
       expect(described_class.supports?("claude-3")).to be false
+    end
+  end
+
+  describe 'Gemini client monkey patch' do
+    let(:real_client) do
+      Gemini.new(
+        credentials: {
+          service: 'generative-language-api',
+          api_key: 'some-api-key'
+        },
+        options: { model: 'gemini-pro', server_sent_events: true }
+      )
+    end
+
+    it 'allows reading model' do
+      expect(real_client.model).to eq('gemini-pro')
+    end
+
+    it 'allows writing model' do
+      test_address = 'gemini-2.0-flash'
+      real_client.model = test_address
+      expect(real_client.model).to eq(test_address)
     end
   end
 end 

@@ -10,6 +10,11 @@ module Rach
       end
 
       def chat(**parameters)
+        # Update the client's model if it differs from the request
+        if parameters.dig(:parameters, :model) != @client.model
+          @client.model = parameters.dig(:parameters, :model)
+        end
+
         messages = parameters.dig(:parameters, :messages) || []
         system_message = messages.find { |msg| msg[:role] == "system" }
         messages = messages.reject { |msg| msg[:role] == "system" } if system_message
