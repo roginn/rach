@@ -13,7 +13,7 @@ module Rach
         setup_providers(providers)
       elsif access_token && model
         provider = Provider.for(model)
-        setup_providers({ provider.key => { access_token: access_token } })
+        setup_providers({ provider.key => { access_token: access_token, model: model } })
       else
         raise ArgumentError, "Either (providers) or (access_token AND model) must be provided"
       end
