@@ -30,12 +30,27 @@ module Rach
           end
         end
 
-        if @logger
-          @logger.info("Making API call to Google Gemini")
-          @logger.info("Request parameters: #{contents.inspect}")
+        request_params = { contents: contents }
+
+        # Handle response format if provided
+        if response_format = parameters.dig(:parameters, :response_format)
+          request_params[:generation_config] = {
+            response_mime_type: 'application/json',
+            response_schema: convert_response_format(response_format)
+          }
         end
 
-        raw_response = @client.generate_content({ contents: contents })
+        if request_params.dig(:generation_config, :response_schema)
+          request_params[:generation_config][:response_schema].delete(:additionalProperties)
+          request_params[:generation_config][:response_schema].delete(:required)
+        end
+
+        if @logger
+          @logger.info("Making API call to Google Gemini")
+          @logger.info("Request parameters: #{request_params.inspect}")
+        end
+
+        raw_response = @client.generate_content(request_params)
 
         if @logger
           @logger.info("Response: #{raw_response.inspect}")
@@ -66,11 +81,24 @@ module Rach
             service: 'generative-language-api',
             api_key: access_token
           },
-          options: { model: 'gemini-pro' }
+          options: { model: config[:model] }
         }
-        client_config[:options].merge!(config)
+        
+        # Only merge additional options that aren't already set
+        client_config[:options].merge!(config.except(:model))
 
-        ::Gemini.new(**client_config)
+        # Function calling and structured output are broken in this gem
+        gemini = ::Gemini.new(**client_config)
+        base_address = gemini.instance_variable_get(:@base_address)
+        base_address.gsub! 'v1', 'v1beta'
+        gemini
+      end
+
+      def convert_response_format(format)
+        return unless format[:type] == "json_schema"
+
+        schema = format.dig(:json_schema, :schema)
+        schema.deep_symbolize_keys
       end
     end
   end
