@@ -90,7 +90,7 @@ module Rach
         # Function calling and structured output are broken in this gem
         gemini = ::Gemini.new(**client_config)
         base_address = gemini.instance_variable_get(:@base_address)
-        base_address.gsub! 'v1', 'v1beta'
+        base_address.gsub!('v1', 'v1beta') if base_address
         gemini
       end
 
